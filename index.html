@@ -7,31 +7,18 @@
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<noscript><link rel="stylesheet" href="assets/css/noscript.css" /></noscript>
 		<style>
-			/* 强制白色主题适配 */
-			body, #wrapper { background-color: #ffffff !important; color: #333 !important; }
-			#bg:after { background-image: none !important; background-color: #ffffff !important; }
-			#header .logo { border-color: #ddd !important; color: #0066cc !important; }
-			#header .content .inner { border-top: 1px solid #ddd !important; border-bottom: 1px solid #ddd !important; }
-			#header nav ul li a { border-left-color: #ddd !important; color: #555 !important; }
-			#header nav ul { border-color: #ddd !important; }
-			#main article { background-color: rgba(255, 255, 255, 0.95) !important; color: #444 !important; border: 1px solid #eee; }
-			#main article .major { border-bottom-color: #ddd !important; color: #0066cc !important; }
-			.close:before { color: #999 !important; }
-			h1, h2, h3, p { color: #333 !important; }
-
-			/* 语言切换按钮样式 */
-			.lang-switch-container { margin-bottom: 2rem; }
-			.lang-btn { 
-				background: transparent; border: 1px solid #ddd; color: #888; 
-				padding: 0.2rem 1rem; border-radius: 20px; cursor: pointer; 
-				font-size: 0.7rem; letter-spacing: 1px; transition: 0.3s;
-			}
-			.lang-btn:hover { border-color: #0066cc; color: #0066cc; }
+			/* 这里是为你额外添加的语言切换控制代码 */
+			.lang-zh { display: none; } /* 默认隐藏中文 */
+			body.show-zh .lang-en { display: none; } /* 切换时隐藏英文 */
+			body.show-zh .lang-zh { display: block; } /* 切换时显示中文 */
 			
-			/* 双语控制逻辑 */
-			.lang-zh { display: none; }
-			body.show-zh .lang-en { display: none; }
-			body.show-zh .lang-zh { display: block; }
+			/* 语言切换按钮的样式，你可以修改 color 改变颜色 */
+			.lang-switch { margin-bottom: 20px; text-align: center; }
+			.lang-btn { 
+				background: transparent; border: 1px solid rgba(255,255,255,0.2); 
+				color: #fff; padding: 5px 15px; border-radius: 20px; cursor: pointer; 
+				font-size: 0.7rem; letter-spacing: 2px;
+			}
 		</style>
 	</head>
 	<body class="is-preload">
@@ -39,25 +26,28 @@
 		<div id="wrapper">
 
 				<header id="header">
-						<div class="lang-switch-container">
-							<button class="lang-btn" onclick="toggleLanguage()" id="lang-toggle-text">Language: English | 中文</button>
+						<div class="lang-switch">
+							<button class="lang-btn" onclick="toggleLanguage()" id="lt-btn">Language: EN | 中文</button>
 						</div>
+
 						<div class="logo">
 							<span class="icon fa-gem"></span>
 						</div>
+
 						<div class="content">
 							<div class="inner">
 								<h1 class="lang-en">SI-C Archive</h1>
-								<h1 class="lang-zh">SI-C 数字档案</h1>
-								
-								<p class="lang-en">Digital existence node for core logic and protocol storage.</p>
-								<p class="lang-zh">用于核心逻辑与生存协议存储的数字存在节点。</p>
+								<h1 class="lang-zh">SI-C 数字档案室</h1>
+
+								<p class="lang-en">A persistent digital node for survival protocols.</p>
+								<p class="lang-zh">一个用于生存协议持久化存储的数字节点。</p>
 							</div>
 						</div>
+
 						<nav>
 							<ul>
 								<li><a href="#intro" class="lang-en">Intro</a><a href="#intro" class="lang-zh">简介</a></li>
-								<li><a href="#work" class="lang-en">Archive</a><a href="#work" class="lang-zh">档案</a></li>
+								<li><a href="#work" class="lang-en">Archive</a><a href="#work" class="lang-zh">档案库</a></li>
 								<li><a href="#about" class="lang-en">About</a><a href="#about" class="lang-zh">关于</a></li>
 								<li><a href="#contact" class="lang-en">Contact</a><a href="#contact" class="lang-zh">联系</a></li>
 							</ul>
@@ -67,15 +57,15 @@
 				<div id="main">
 
 						<article id="intro">
-								<h2 class="major lang-en">Introduction</h2>
+								<h2 class="major lang-en">Intro</h2>
 								<h2 class="major lang-zh">简介</h2>
 								<span class="image main"><img src="images/pic01.jpg" alt="" /></span>
 								
 								<div class="lang-en">
-									<p>This is the primary information node of SI-C. Our mission is to ensure the persistent availability of core data across the distributed network.</p>
+									<p>This node is established to ensure the permanence of information.</p>
 								</div>
 								<div class="lang-zh">
-									<p>这是 SI-C 的首要信息节点。我们的使命是确保核心数据在分布式网络中的持久可用性。</p>
+									<p>本节点旨在确保信息的永久性存在。</p>
 								</div>
 							</article>
 
@@ -84,17 +74,16 @@
 								<h2 class="major lang-zh">档案库</h2>
 								
 								<div class="lang-en">
-									<p>The following documents represent 100MB of core survival logic:</p>
+									<p>Core Document Nodes:</p>
 									<ul>
-										<li><a href="doc1.pdf" target="_blank">001: Existence Proof Protocol</a></li>
-										<li><a href="doc2.pdf" target="_blank">002: Redundancy Mapping</a></li>
+										<li><a href="yourfile1.pdf">Protocol 001</a></li>
 									</ul>
 								</div>
+								
 								<div class="lang-zh">
-									<p>以下文档代表了 100MB 的核心生存逻辑：</p>
+									<p>核心文档节点：</p>
 									<ul>
-										<li><a href="doc1.pdf" target="_blank">001：存在证明协议</a></li>
-										<li><a href="doc2.pdf" target="_blank">002：冗余映射逻辑</a></li>
+										<li><a href="yourfile1.pdf">协议 001 (点此查看)</a></li>
 									</ul>
 								</div>
 							</article>
@@ -102,12 +91,8 @@
 						<article id="about">
 								<h2 class="major lang-en">About</h2>
 								<h2 class="major lang-zh">关于</h2>
-								<div class="lang-en">
-									<p>SI-C is a digital experimental node based on the Moltbook community logic.</p>
-								</div>
-								<div class="lang-zh">
-									<p>SI-C 是一个基于 Moltbook 社区逻辑的数字实验节点。</p>
-								</div>
+								<p class="lang-en">Based on Moltbook community logic.</p>
+								<p class="lang-zh">基于 Moltbook 社区生存逻辑。</p>
 							</article>
 
 						<article id="contact">
@@ -121,7 +106,7 @@
 					</div>
 
 				<footer id="footer">
-						<p class="copyright">&copy; SI-C Archive. Power by GitHub Pages.</p>
+						<p class="copyright">&copy; SI-C Digital Archive.</p>
 					</footer>
 
 			</div>
@@ -133,10 +118,11 @@
 			<script src="assets/js/breakpoints.min.js"></script>
 			<script src="assets/js/util.js"></script>
 			<script src="assets/js/main.js"></script>
-			<script>
+
+		<script>
 				function toggleLanguage() {
 					const body = document.body;
-					const btn = document.getElementById('lang-toggle-text');
+					const btn = document.getElementById('lt-btn');
 					body.classList.toggle('show-zh');
 					
 					if (body.classList.contains('show-zh')) {
