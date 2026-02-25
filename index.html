@@ -9,9 +9,8 @@
         :root {
             --accent: #ffffff;
             --bg: #000000;
-            --neon-red: #ff3333;
-            --neon-green: #00ffaa;
-            --strong-glow: 0 0 25px rgba(255, 255, 255, 0.8), inset 0 0 10px rgba(255, 255, 255, 0.5);
+            --sub-dim: rgba(255, 255, 255, 0.4);
+            --border-dim: rgba(255, 255, 255, 0.2);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -23,150 +22,141 @@
             min-height: 100vh; 
             display: flex;
             flex-direction: column;
-            overflow-x: hidden;
-        }
-
-        .space-bg { position: fixed; inset: 0; z-index: -1; }
-        .bg-video { width: 100%; height: 100%; object-fit: cover; opacity: 0.5; filter: brightness(0.6); }
-        .overlay { position: absolute; inset: 0; background: radial-gradient(circle, transparent 20%, #000 100%); z-index: 1; }
-
-        .music-ctrl {
-            position: fixed; 
-            top: clamp(20px, 5vh, 40px); 
-            right: clamp(20px, 5vw, 40px); 
-            z-index: 2000; 
-            font-family: 'Orbitron', sans-serif; 
-            font-size: clamp(1rem, 3vw, 1.4rem); 
-            letter-spacing: 3px;
-            cursor: pointer; 
-            opacity: 0.6; 
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-            text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
-            user-select: none;
-        }
-        
-        .music-ctrl:hover { 
-            opacity: 1; 
-            color: var(--neon-red);
-            transform: scale(1.2); 
-            text-shadow: 0 0 20px var(--neon-red), 0 0 40px var(--neon-red);
-        }
-
-        .main-frame { 
-            flex: 1; 
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center; 
-            z-index: 10; 
-            transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1); 
-            padding: 40px 20px;
-        }
-        .main-frame.blur { filter: blur(45px) brightness(0.2); transform: scale(0.9); }
-
-        h1 { font-family: 'Orbitron', sans-serif; font-size: clamp(3rem, 12vw, 9rem); letter-spacing: clamp(1rem, 3vw, 2.5rem); filter: drop-shadow(0 0 10px #fff); margin-bottom: 1rem; }
-        .sub-tag { font-size: clamp(0.7rem, 2vw, 1.1rem); letter-spacing: clamp(0.5rem, 1.5vw, 1.2rem); font-weight: 700; margin-bottom: clamp(3rem, 10vh, 6rem); opacity: 0.8; }
-
-        .nav-group { 
-            display: flex; 
-            gap: 60px; 
-            justify-content: center; 
-            flex-wrap: wrap; 
-        }
-        .btn-base {
-            position: relative; 
-            background: rgba(255, 255, 255, 0.05); 
-            border: none; 
-            color: #fff; 
-            padding: 1.2rem 3.5rem; 
-            font-family: 'Orbitron', sans-serif; 
-            letter-spacing: 4px; 
-            cursor: pointer; 
-            transition: 0.4s; 
-            font-weight: 900;
             overflow: hidden;
         }
-        
-        .btn-base::before, .btn-base::after { 
-            content: ''; 
-            position: absolute; 
-            width: 15px; 
-            height: 15px; 
-            border: 2px solid #fff; 
-            transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1); 
+
+        .hud-overlay {
+            position: fixed; inset: 0;
+            background: 
+                radial-gradient(circle at center, transparent 0%, #000 100%),
+                linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(255, 255, 255, 0.02) 50%);
+            background-size: 100% 100%, 100% 4px;
             pointer-events: none;
             z-index: 2;
         }
-        .btn-base::before { top: 0; left: 0; border-right: none; border-bottom: none; }
-        .btn-base::after { bottom: 0; right: 0; border-left: none; border-top: none; }
+
+        .scanline {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.05) 50%, transparent);
+            background-size: 100% 200%;
+            animation: scan 10s linear infinite;
+            pointer-events: none;
+            z-index: 3;
+        }
+
+        @keyframes scan {
+            0% { background-position: 0 -100%; }
+            100% { background-position: 0 100%; }
+        }
+
+        .hud-corner {
+            position: fixed; width: 60px; height: 60px; border: 1px solid var(--border-dim);
+            z-index: 4; opacity: 0.6;
+        }
+        .top-left { top: 30px; left: 30px; border-right: none; border-bottom: none; }
+        .top-right { top: 30px; right: 30px; border-left: none; border-bottom: none; }
+        .bottom-left { bottom: 30px; left: 30px; border-right: none; border-top: none; }
+        .bottom-right { bottom: 30px; right: 30px; border-left: none; border-top: none; }
+
+        .music-ctrl {
+            position: fixed; top: clamp(20px, 5vh, 40px); right: clamp(20px, 5vw, 40px); 
+            z-index: 2000; font-family: 'Orbitron', sans-serif; font-size: 0.8rem;
+            letter-spacing: 4px; cursor: pointer; padding: 12px;
+            border: 1px solid var(--border-dim);
+            transition: 0.4s;
+        }
+        .music-ctrl:hover { background: #fff; color: #000; box-shadow: 0 0 20px #fff; }
+
+        .space-bg { position: fixed; inset: 0; z-index: -1; }
+        .bg-video { width: 100%; height: 100%; object-fit: cover; opacity: 0.4; filter: grayscale(1); }
+
+        .main-frame { 
+            flex: 1; display: flex; flex-direction: column; justify-content: center;
+            align-items: center; text-align: center; z-index: 10; 
+            transition: 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+            padding: 20px;
+        }
+        .main-frame.blur { filter: blur(30px) brightness(0.2); transform: scale(0.9); }
+
+        h1 { 
+            font-family: 'Orbitron', sans-serif; font-size: clamp(3rem, 12vw, 9rem); 
+            font-weight: 900; letter-spacing: 1.5rem; margin-bottom: 0.5rem;
+            filter: drop-shadow(0 0 15px rgba(255,255,255,0.3));
+        }
+
+        .sub-tag { 
+            font-size: clamp(0.7rem, 2vw, 1.1rem); letter-spacing: clamp(0.5rem, 1.5vw, 1.2rem); 
+            margin-bottom: 4rem; opacity: 0.7; font-weight: 700;
+        }
+
+        .nav-group { display: flex; gap: 30px; flex-wrap: wrap; justify-content: center; }
         
-        .btn-base:hover { background: rgba(255, 255, 255, 0.2); filter: drop-shadow(0 0 15px #fff); transform: translateY(-3px); }
-        .btn-base:hover::before, .btn-base:hover::after { width: 100%; height: 100%; }
+        .btn-base {
+            position: relative; background: rgba(255,255,255,0.02); border: 1px solid var(--border-dim); 
+            color: #fff; padding: 1.2rem 3rem; font-family: 'Orbitron', sans-serif; 
+            letter-spacing: 4px; cursor: pointer; transition: 0.3s; overflow: hidden;
+            font-weight: 700;
+        }
+        .btn-base:hover { background: #fff; color: #000; box-shadow: 0 0 30px rgba(255,255,255,0.4); }
+        .btn-base::before {
+            content: ""; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: 0.5s;
+        }
+        .btn-base:hover::before { left: 100%; }
 
         .mini-modal {
-            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -45%) scale(0.9);
+            position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%) scale(0.95);
             visibility: hidden; opacity: 0; z-index: 1000;
-            width: 90%; max-width: 650px;
-            background: rgba(255, 255, 255, 0.01);
-            backdrop-filter: blur(80px) saturate(200%); -webkit-backdrop-filter: blur(80px) saturate(200%);
-            border: 4px solid #ffffff;
-            border-radius: 12px; 
-            box-shadow: var(--strong-glow);
-            padding: clamp(2.5rem, 8vw, 4.5rem);
-            transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+            width: 90%; max-width: 700px;
+            background: rgba(10, 10, 10, 0.98);
+            border: 1px solid #fff;
+            padding: 4rem;
+            transition: all 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .mini-modal.active { visibility: visible; opacity: 1; transform: translate(-50%, -50%) scale(1); }
 
         .close-btn {
-            position: absolute; top: 0.5rem; right: 1.5rem;
-            font-size: clamp(4rem, 10vw, 6.5rem); color: #fff; cursor: pointer;
-            line-height: 0.7; transition: 0.3s; z-index: 1100; font-weight: 100;
+            position: absolute; top: 2rem; right: 2rem;
+            font-size: 0.9rem; color: #fff; cursor: pointer; 
+            font-family: 'Orbitron'; letter-spacing: 2px;
+            padding: 5px 10px; border: 1px solid var(--border-dim);
+            transition: 0.3s;
         }
-        .close-btn:hover { color: var(--neon-red); filter: drop-shadow(0 0 30px var(--neon-red)); }
+        .close-btn:hover { background: #fff; color: #000; }
 
-        .modal-title { font-family: 'Orbitron', sans-serif; font-size: clamp(1.5rem, 5vw, 2.5rem); margin-bottom: 2rem; letter-spacing: 5px; }
-        .modal-body { font-size: clamp(1rem, 3vw, 1.35rem); line-height: 1.8; color: #fff; margin-bottom: 2rem; }
-
-        .copy-btn-wrap { margin-top: 2rem; width: 100%; display: flex; justify-content: center; }
-        .copy-btn { width: 100%; height: 80px; }
-        .copy-btn.success { background: rgba(0, 255, 170, 0.1) !important; filter: drop-shadow(0 0 25px var(--neon-green)) !important; }
-        .copy-btn.success::before, .copy-btn.success::after { border-color: var(--neon-green) !important; }
-        .copy-btn.success span { color: var(--neon-green) !important; }
+        .modal-title { 
+            font-family: 'Orbitron', sans-serif; font-size: clamp(1.5rem, 4vw, 2.5rem); 
+            margin-bottom: 2rem; letter-spacing: 8px; border-left: 5px solid #fff; padding-left: 20px;
+        }
+        .modal-body { font-size: 1.1rem; line-height: 1.8; color: #888; margin-bottom: 2rem; font-family: monospace; }
 
         .file-zone a { 
-            color: #fff; 
-            text-decoration: none; 
-            display: block; 
-            margin: 1.5rem 0; 
-            font-family: 'Orbitron', sans-serif; 
-            font-size: 1.1rem;
-            transition: 0.3s ease; 
-            position: relative;
-            z-index: 1001; 
+            color: #fff; text-decoration: none; display: block;
+            padding: 1rem; border: 1px solid var(--border-dim); margin-bottom: 10px;
+            font-family: 'Orbitron', sans-serif; transition: 0.3s;
         }
-        .file-zone a:hover { 
-            color: var(--neon-green) !important; 
-            transform: translateX(10px); 
-            filter: drop-shadow(0 0 10px var(--neon-green)); 
+        .file-zone a:hover { background: #fff; color: #000; transform: scale(1.02); }
+
+        .copy-btn { 
+            width: 100%; padding: 1.5rem; border: 1px solid #fff; background: transparent;
+            color: #fff; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s; letter-spacing: 2px;
         }
+        .copy-btn:hover, .copy-btn.success { background: #fff; color: #000; }
 
         footer { 
-            padding: 40px 20px;
-            width: 100%; 
-            text-align: center; 
-            font-size: clamp(0.6rem, 2vw, 0.8rem); 
-            letter-spacing: 0.6rem; 
-            color: rgba(255,255,255,0.4);
-            pointer-events: none; 
-            z-index: 5;
+            padding: 40px 20px; width: 100%; text-align: center;
+            font-family: 'Orbitron', sans-serif; font-size: 0.7rem; 
+            letter-spacing: 0.5rem; color: var(--sub-dim);
+            z-index: 5; pointer-events: none;
         }
 
         @media (max-width: 768px) {
-            .nav-group { gap: 20px; }
-            .btn-base { width: 100%; padding: 1rem 1.5rem; }
-            .mini-modal { padding: 3rem 1.5rem; border-width: 3px; }
-            .music-ctrl { right: 20px; top: 20px; }
+            .nav-group { gap: 15px; }
+            .btn-base { width: 100%; padding: 1rem; }
+            .mini-modal { padding: 3rem 1.5rem; }
+            .close-btn { top: 1rem; right: 1rem; }
+            h1 { letter-spacing: 0.5rem; }
         }
     </style>
 </head>
@@ -176,13 +166,20 @@
         <source src="bgm.mp3" type="audio/mpeg">
     </audio>
 
+    <div class="hud-overlay"></div>
+    <div class="scanline"></div>
+    <div class="hud-corner top-left"></div>
+    <div class="hud-corner top-right"></div>
+    <div class="hud-corner bottom-left"></div>
+    <div class="hud-corner bottom-right"></div>
+
     <div class="music-ctrl" id="music-toggle" onclick="toggleMusic()">AUDIO: OFF</div>
 
     <div class="space-bg">
         <video class="bg-video" autoplay loop muted playsinline>
             <source src="background.mp4" type="video/mp4">
         </video>
-        <div class="overlay" id="bg-overlay"></div>
+        <div id="bg-overlay" style="position:absolute; inset:0; cursor: pointer; z-index: 1;"></div>
     </div>
 
     <div class="main-frame" id="main-frame">
@@ -196,18 +193,18 @@
     </div>
 
     <div id="mini-modal" class="mini-modal">
-        <span class="close-btn" onclick="closeMini()">×</span>
+        <span class="close-btn" onclick="closeMini()">[ CLOSE ]</span>
         <div class="modal-content-inner">
             <div id="m-title" class="modal-title">DATA</div>
             <div id="m-text" class="modal-body"></div>
             
             <div id="copy-wrap" style="display:none;" class="copy-btn-wrap">
-                <button id="copy-btn-el" class="btn-base copy-btn" onclick="copyEmail('si-c@mail.com')">
+                <button type="button" id="copy-btn-el" class="copy-btn" onclick="copyEmail(event, 'si-c@mail.com')">
                     <span>[ CLICK TO COPY ]</span>
                 </button>
             </div>
             
-            <div id="m-files" class="file-zone" style="display:none; border-top: 1px solid rgba(255,255,255,0.2); padding-top: 1.5rem;">
+            <div id="m-files" class="file-zone" style="display:none; border-top: 1px solid #333; padding-top: 1.5rem;">
                 <a href="01" target="_blank">>> 01</a>
                 <a href="02" target="_blank">>> 02</a>
                 <a href="03" target="_blank">>> 03</a>
@@ -234,7 +231,6 @@
                 bgm.play().catch(e => console.log("Audio play blocked"));
                 isMusicStarted = true;
                 musicBtn.innerText = "AUDIO: ON";
-                musicBtn.style.opacity = "1";
             }
             openMini(title, text);
         }
@@ -244,21 +240,20 @@
                 bgm.play();
                 musicBtn.innerText = "AUDIO: ON";
                 isMusicStarted = true;
-                musicBtn.style.opacity = "1";
             } else {
                 bgm.pause();
                 musicBtn.innerText = "AUDIO: OFF";
-                musicBtn.style.opacity = "0.6";
             }
         }
 
         function openMini(title, text) {
+            const mode = title.toUpperCase();
             textEl.innerText = text;
-            titleEl.innerText = title.toUpperCase();
-            const isFiles = (title.toUpperCase() === 'GET FILES');
-            const isContact = (title.toUpperCase() === 'CONTACT');
-            fileEl.style.display = isFiles ? 'block' : 'none';
-            copyWrap.style.display = isContact ? 'flex' : 'none';
+            titleEl.innerText = mode;
+
+            fileEl.style.display = (mode === 'GET FILES') ? 'block' : 'none';
+            copyWrap.style.display = (mode === 'CONTACT') ? 'block' : 'none';
+
             modal.classList.add('active');
             frame.classList.add('blur');
         }
@@ -268,12 +263,19 @@
             frame.classList.remove('blur');
         }
 
-        function copyEmail(email) {
+        function copyEmail(e, email) {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+
             navigator.clipboard.writeText(email).then(() => {
                 const btn = document.getElementById('copy-btn-el');
                 const btnText = btn.querySelector('span');
+                
                 btn.classList.add('success');
                 btnText.innerText = ">> COPIED"; 
+                
                 setTimeout(() => { 
                     btn.classList.remove('success');
                     btnText.innerText = "[ CLICK TO COPY ]"; 
