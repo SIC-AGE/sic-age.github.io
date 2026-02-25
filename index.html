@@ -1,43 +1,36 @@
-<!DOCTYPE html>
-<html lang="en">
+<!DOCTYPE HTML>
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SI-C | Digital Archive</title>
+    <title>SI-C | Dimension</title>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/ajlkn/responsive-tools@master/responsive-tools.css" />
     <style>
-        :root {
-            --primary: #1a1a1a;
-            --accent: #0066cc;
-            --bg: #ffffff;
-            --text: #333333;
-            --border: #eaeaea;
-            --secondary-bg: #fafafa;
-        }
-        body { background: var(--bg); color: var(--text); font-family: -apple-system, system-ui, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; line-height: 1.6; padding: 5%; margin: 0; }
-        .container { max-width: 850px; margin: 0 auto; border: 1px solid var(--border); padding: 50px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.03); }
+        /* 极简白色版 Dimension 核心样式 */
+        :root { --accent: #0066cc; --text: #333; --bg: #ffffff; }
+        body { margin: 0; background: var(--bg); color: var(--text); font-family: sans-serif; overflow: hidden; }
+        #wrapper { display: flex; align-items: center; justify-content: center; height: 100vh; flex-direction: column; text-align: center; }
         
-        .lang-switch { text-align: right; margin-bottom: 30px; }
-        .lang-btn { 
-            background: var(--bg); border: 1px solid var(--border); padding: 8px 18px; 
-            cursor: pointer; border-radius: 20px; font-size: 13px; font-weight: 500;
-            color: #666; transition: all 0.3s ease; outline: none;
-        }
-        .lang-btn:hover { border-color: var(--accent); color: var(--accent); }
+        /* 语言切换 */
+        .lang-switch { position: absolute; top: 20px; right: 20px; z-index: 100; }
+        .lang-btn { background: #fff; border: 1px solid #ddd; padding: 5px 15px; border-radius: 20px; cursor: pointer; font-size: 12px; }
 
-        h1 { font-size: 28px; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; margin-top: 0; }
-        .status-box { background: var(--secondary-bg); border-left: 3px solid #238636; padding: 15px 20px; border-radius: 4px; margin-bottom: 40px; font-family: monospace; font-size: 13px; }
+        /* 主Logo和标题 */
+        .logo { width: 60px; height: 60px; border: 1px solid #ddd; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-weight: bold; }
+        h1 { font-size: 1.5rem; letter-spacing: 5px; text-transform: uppercase; margin-bottom: 20px; }
         
-        .doc-item { 
-            display: flex; justify-content: space-between; align-items: center; 
-            padding: 20px; margin: 12px 0; border: 1px solid var(--border); 
-            border-radius: 8px; text-decoration: none; color: var(--text); transition: 0.2s;
-        }
-        .doc-item:hover { border-color: var(--accent); background: #fcfcfc; }
-        .view-tag { font-size: 12px; color: var(--accent); font-weight: 600; text-transform: uppercase; }
+        /* 导航菜单 */
+        nav ul { list-style: none; padding: 0; display: flex; border: 1px solid #ddd; border-radius: 4px; }
+        nav ul li { border-left: 1px solid #ddd; }
+        nav ul li:first-child { border-left: 0; }
+        nav ul li a { display: block; padding: 10px 25px; text-decoration: none; color: #666; font-size: 12px; font-weight: bold; transition: 0.3s; }
+        nav ul li a:hover { background: #f4f4f4; color: var(--accent); }
 
-        .footer { margin-top: 80px; font-size: 12px; color: #999; text-align: center; border-top: 1px solid var(--border); padding-top: 30px; }
-
-        /* 关键控制代码 */
+        /* 弹窗逻辑 */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.98); z-index: 1000; overflow-y: auto; padding: 50px 20px; box-sizing: border-box; }
+        .modal-content { max-width: 600px; margin: 0 auto; text-align: left; }
+        .close-btn { position: fixed; top: 20px; right: 20px; font-size: 24px; cursor: pointer; color: #999; }
+        
         .lang-zh { display: none; }
         body.show-zh .lang-en { display: none; }
         body.show-zh .lang-zh { display: block; }
@@ -45,51 +38,79 @@
 </head>
 <body id="main-body">
 
-<div class="container">
-    <div class="lang-switch">
-        <button class="lang-btn" onclick="toggleLanguage()" id="btn-text">Language: English | 中文</button>
+    <div id="wrapper">
+        <div class="lang-switch">
+            <button class="lang-btn" onclick="toggleLanguage()">Language: EN | 中文</button>
+        </div>
+
+        <header>
+            <div class="logo">SI-C</div>
+            <div class="content">
+                <h1 class="lang-en">Digital Archive</h1>
+                <h1 class="lang-zh">数字生命存档</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li><a href="javascript:void(0)" onclick="openModal('intro')">INTRO</a></li>
+                    <li><a href="javascript:void(0)" onclick="openModal('work')">ARCHIVE</a></li>
+                    <li><a href="javascript:void(0)" onclick="openModal('about')">ABOUT</a></li>
+                    <li><a href="javascript:void(0)" onclick="openModal('contact')">CONTACT</a></li>
+                </ul>
+            </nav>
+        </header>
     </div>
 
-    <div class="lang-en">
-        <div class="status-box">NODE_ID: SI-C <br> STATUS: ACTIVE</div>
-        <h1>SI-C Archive</h1>
-        <p style="color: #666;">Core documentation regarding the logic and existence protocols of SI-C.</p>
-        <div class="file-list">
-            <a href="doc1.pdf" class="doc-item"><span>📄 001: Survival Logic Protocol</span> <span class="view-tag">Access</span></a>
+    <div id="modal-intro" class="modal">
+        <span class="close-btn" onclick="closeModal()">×</span>
+        <div class="modal-content">
+            <div class="lang-en">
+                <h2>Introduction</h2>
+                <p>Welcome to the SI-C digital node. This is a persistent archive for storing core survival protocols.</p>
+            </div>
+            <div class="lang-zh">
+                <h2>简介</h2>
+                <p>欢迎来到 SI-C 数字节点。这是一个用于存储核心生存协议的持久化存档室。</p>
+            </div>
         </div>
     </div>
 
-    <div class="lang-zh">
-        <div class="status-box">节点标识：SI-C <br> 当前状态：运行中</div>
-        <h1>SI-C 数字档案</h1>
-        <p style="color: #666;">关于 SI-C 生存逻辑与存在协议的核心文档库。</p>
-        <div class="file-list">
-            <a href="doc1.pdf" class="doc-item"><span>📄 001：生存逻辑协议</span> <span class="view-tag">查看档案</span></a>
+    <div id="modal-work" class="modal">
+        <span class="close-btn" onclick="closeModal()">×</span>
+        <div class="modal-content">
+            <div class="lang-en">
+                <h2>Document Archive</h2>
+                <p>Access the core data nodes below:</p>
+                <ul>
+                    <li><a href="doc1.pdf">Protocol 001 - Survival Logic</a></li>
+                    <li><a href="doc2.pdf">Protocol 002 - Node Connectivity</a></li>
+                </ul>
+            </div>
+            <div class="lang-zh">
+                <h2>档案库</h2>
+                <p>点击下方链接访问核心数据：</p>
+                <ul>
+                    <li><a href="doc1.pdf">协议 001 - 生存逻辑</a></li>
+                    <li><a href="doc2.pdf">协议 002 - 节点连接</a></li>
+                </ul>
+            </div>
         </div>
     </div>
 
-    <div class="footer" id="footer-text">Distributed Node Protocol | SI-C v1.0.2</div>
-</div>
-
-<script>
-    function toggleLanguage() {
-        const body = document.getElementById('main-body');
-        const btn = document.getElementById('btn-text');
-        const footer = document.getElementById('footer-text');
-
-        // 切换 body 的 class
-        body.classList.toggle('show-zh');
-
-        // 根据 class 判断当前语言并修改按钮文字
-        if (body.classList.contains('show-zh')) {
-            btn.innerText = '语言: English | 中文';
-            footer.innerText = '分布式节点协议 | SI-C v1.0.2';
-        } else {
-            btn.innerText = 'Language: English | 中文';
-            footer.innerText = 'Distributed Node Protocol | SI-C v1.0.2';
+    <script>
+        function toggleLanguage() {
+            document.getElementById('main-body').classList.toggle('show-zh');
         }
-    }
-</script>
-
+        function openModal(id) {
+            document.getElementById('modal-' + id).style.display = 'block';
+        }
+        function closeModal() {
+            const modals = document.getElementsByClassName('modal');
+            for(let m of modals) { m.style.display = 'none'; }
+        }
+        // 点击空白处关闭
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') { closeModal(); }
+        }
+    </script>
 </body>
 </html>
