@@ -49,14 +49,7 @@
             100% { background-position: 0 100%; }
         }
 
-        .hud-corner {
-            position: fixed; width: 60px; height: 60px; border: 1px solid var(--border-dim);
-            z-index: 4; opacity: 0.6;
-        }
-        .top-left { top: 30px; left: 30px; border-right: none; border-bottom: none; }
-        .top-right { top: 30px; right: 30px; border-left: none; border-bottom: none; }
-        .bottom-left { bottom: 30px; left: 30px; border-right: none; border-top: none; }
-        .bottom-right { bottom: 30px; right: 30px; border-left: none; border-top: none; }
+        /* 移除了 .hud-corner 相关的 CSS 样式 */
 
         .music-ctrl {
             position: fixed; top: clamp(20px, 5vh, 40px); right: clamp(20px, 5vw, 40px); 
@@ -168,11 +161,6 @@
 
     <div class="hud-overlay"></div>
     <div class="scanline"></div>
-    <div class="hud-corner top-left"></div>
-    <div class="hud-corner top-right"></div>
-    <div class="hud-corner bottom-left"></div>
-    <div class="hud-corner bottom-right"></div>
-
     <div class="music-ctrl" id="music-toggle" onclick="toggleMusic()">AUDIO: OFF</div>
 
     <div class="space-bg">
@@ -289,5 +277,3 @@
     </script>
 </body>
 </html>
-
-
