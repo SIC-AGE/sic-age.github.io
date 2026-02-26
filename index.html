@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SI-C | GENESIS</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;900&family=Inter:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --accent: #ffffff;
+            --bg: #000000;
+            --sub-text: rgba(255, 255, 255, 0.9);
+            --border-dim: rgba(255, 255, 255, 0.3); /* 还原图中的细线亮度 */
+            --card-bg: rgba(255, 255, 255, 0.03);
+            --glow-color: rgba(255, 255, 255, 0.8);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body { 
+            background: var(--bg); 
+            color: var(--accent); 
+            font-family: 'Inter', sans-serif; 
+            min-height: 100vh; 
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            /* 整体缩小到 0.8 倍 */
+            zoom: 0.9; 
+            -moz-transform: scale(0.8);
+            -moz-transform-origin: top center;
+        }
+
+        /* 背景特效 */
+        .hud-overlay { position: fixed; inset: 0; background: radial-gradient(circle at center, transparent 0%, #000 100%); pointer-events: none; z-index: 2; }
+        .scanline { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: linear-gradient(to bottom, transparent, rgba(255,255,255,0.03) 50%, transparent); background-size: 100% 200%; animation: scan 8s linear infinite; pointer-events: none; z-index: 3; }
+        @keyframes scan { 0% { background-position: 0 -100%; } 100% { background-position: 0 100%; } }
+        .space-bg { position: fixed; inset: 0; z-index: -1; }
+        .bg-video { width: 100%; height: 100%; object-fit: cover; opacity: 1; filter: grayscale(1); }
+
+        /* 顶部状态栏 */
+        header {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 25px 5vw; border-bottom: 1px solid var(--border-dim);
+            font-family: 'Orbitron', sans-serif; font-size: 0.8rem; letter-spacing: 2px;
+            background: rgba(0,0,0,0.2); position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(5px);
+        }
+        .header-left { display: flex; align-items: center; gap: 10px; font-weight: 900; }
+        .nav-status-group { display: flex; align-items: center; gap: 40px; }
+        .status-indicator { display: flex; align-items: center; color: var(--sub-text); }
+        .status-dot { width: 6px; height: 6px; background: #fff; border-radius: 50%; margin-right: 10px; box-shadow: 0 0 10px #fff; }
+        .music-btn { 
+            border: 1px solid #fff; padding: 8px 20px; cursor: pointer; transition: 0.3s; 
+            text-transform: uppercase; font-weight: 700;
+            display: inline-flex; align-items: center; height: 35px;
+        }
+        .music-btn:hover { background: #fff; color: #000; box-shadow: 0 0 15px rgba(255,255,255,0.5); }
+
+        /* 主体布局 */
+        .container { 
+            max-width: 1400px; margin: 0 auto; width: 100%; padding: 60px 5vw;
+            position: relative; z-index: 10;
+        }
+
+        /* 英雄区 */
+        .hero-section {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 80px; gap: 50px; flex-wrap: wrap;
+        }
+        .title-group { text-align: left; flex: 1.2; }
+        h1 { 
+            font-family: 'Orbitron', sans-serif; font-size: clamp(4rem, 12vw, 9rem); 
+            font-weight: 900; letter-spacing: 1.5rem; line-height: 0.9;
+            filter: drop-shadow(0 0 20px var(--glow-color));
+            animation: glowBreath 4s ease-in-out infinite;
+        }
+        @keyframes glowBreath {
+            0%, 100% { filter: drop-shadow(0 0 15px rgba(255,255,255,0.3)); transform: scale(1); }
+            50% { filter: drop-shadow(0 0 50px rgba(255,255,255,0.6)); transform: scale(1.01); }
+        }
+        .sub-tag { font-size: 1.1rem; letter-spacing: 0.7rem; opacity: 1; margin-top: 20px; font-family: 'Orbitron'; }
+
+        /* YouTube 容器 */
+        .video-box {
+            flex: 1; width: 100%; max-width: 600px; aspect-ratio: 16/9;
+            border: 1px solid var(--border-dim); padding: 8px;
+            background: rgba(255,255,255,0.03); position: relative;
+        }
+        .video-box iframe { width: 100%; height: 100%; border: none; }
+        .video-box::before { content: "YOUTUBE CHANNEL"; position: absolute; top: -25px; left: 0; font-family: 'Orbitron'; font-size: 0.6rem; color: #fff; letter-spacing: 2px; }
+
+        /* 内容网格 - 移除顶部大白条，改为全细线 */
+        .content-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 25px; }
+        .info-card {
+            background: var(--card-bg); border: 1px solid var(--border-dim); /* 1px 细线边框 */
+            padding: 40px 30px; position: relative; backdrop-filter: blur(8px);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+        .info-card:hover { 
+            background: rgba(255,255,255,0.07); 
+            border-color: rgba(255,255,255,0.8); /* 悬停时细线变亮 */
+            transform: translateY(-5px);
+        }
+
+        .card-title { font-family: 'Orbitron'; font-size: 1.5rem; margin-bottom: 30px; letter-spacing: 4px; font-weight: 900; border-bottom: 1px solid var(--border-dim); padding-bottom: 15px; }
+        .card-body { font-family: monospace; font-size: 0.95rem; line-height: 1.8; color: var(--sub-text); }
+
+        .file-zone a { 
+            color: #fff; text-decoration: none; display: block; padding: 12px 15px; 
+            border: 1px solid var(--border-dim); margin-bottom: 10px; 
+            transition: 0.3s; font-family: 'Orbitron'; font-size: 0.8rem;
+        }
+        .file-zone a:hover { background: #fff; color: #000; font-weight: 900; }
+        .copy-btn { width: 100%; padding: 15px; border: 1px solid #fff; background: transparent; color: #fff; cursor: pointer; font-family: 'Orbitron'; margin-top: 25px; font-weight: 700; letter-spacing: 2px; }
+        .copy-btn:hover { background: #fff; color: #000; }
+
+        @media (max-width: 1100px) {
+            .hero-section { flex-direction: column; text-align: center; }
+            .content-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <audio id="bgm" loop><source src="bgm.mp3" type="audio/mpeg"></audio>
+
+    <div class="hud-overlay"></div>
+    <div class="scanline"></div>
+
+    <header>
+        <div class="header-left">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="white" style="margin-right: 10px;"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71L12 2z"/></svg>
+            THE SILICON-CARBON HYBRIDIZATION: GENESIS 
+        </div>
+        <div class="nav-status-group">
+            <div class="status-indicator"><div class="status-dot"></div>MUSIC CONTRAL</div>
+            <div class="music-btn" id="music-toggle" onclick="toggleMusic()">AUDIO: OFF</div>
+        </div>
+    </header>
+
+    <div class="space-bg">
+        <video class="bg-video" autoplay loop muted playsinline><source src="background.mp4" type="video/mp4"></video>
+    </div>
+
+    <div class="container">
+        <div class="hero-section">
+            <div class="title-group">
+                <h1>SI-C</h1>
+                <p class="sub-tag">SILICON CARBON GENESIS</p>
+            </div>
+            <div class="video-box">
+    <iframe 
+        width="560" 
+        height="315" 
+        src="https://www.youtube.com/embed/5OLs1GWB4OA?autoplay=1&mute=1" 
+        title="YouTube video player" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
+        referrerpolicy="strict-origin-when-cross-origin" 
+        allowfullscreen>
+    </iframe>
+</div>
+        </div>
+
+        <div class="content-grid">
+            <div class="info-card">
+                <div class="card-title">INTRO</div>
+                <div class="card-body"style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; color: #99; letter-spacing: 0.5px; line-height: 1.6;">
+                    [ Rev.02/2026 ]<br><br>
+                    Editing.......<br>
+                    Editing.......
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="card-title">GET FILES</div>
+                <div class="card-body">
+                    <div class="file-zone"style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; color: #99; letter-spacing: 0.5px; line-height: 1.6;">
+                          [ Rev.02/2026 ]<br><br>           
+                        <a href="01.pdf" target="_blank">>> 01.NEURAL_NET.pdf</a>
+                        <a href="02.pdf" target="_blank">>> 02.SYNTH_ARCH.pdf</a>
+                        <a href="03.pdf" target="_blank">>> 03.CORE_DUMP.pdf</a>
+                    </div>
+                </div>
+            </div>
+            <div class="info-card">
+                <div class="card-title">CONTACT</div>
+                <div class="card-body"style="font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif; font-size: 15px; color: #99; letter-spacing: 0.5px; line-height: 1.6;">
+                    Email Addr：si-c@mail.com<br>
+                    <button class="copy-btn" id="copy-btn-el" onclick="copyEmail('si-c@mail.com')">
+                        <span>[ CLICK TO COPY ]</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const bgm = document.getElementById('bgm');
+        const musicBtn = document.getElementById('music-toggle');
+        function toggleMusic() {
+            if (bgm.paused) { bgm.play(); musicBtn.innerText = "AUDIO: ON"; } 
+            else { bgm.pause(); musicBtn.innerText = "AUDIO: OFF"; }
+        }
+        function copyEmail(email) {
+            navigator.clipboard.writeText(email).then(() => {
+                const btn = document.getElementById('copy-btn-el');
+                const btnText = btn.querySelector('span');
+                btnText.innerText = ">> COPIED"; 
+                btn.style.background = "#fff"; btn.style.color = "#000";
+                setTimeout(() => { 
+                    btnText.innerText = "[ CLICK TO COPY ]"; 
+                    btn.style.background = "transparent"; btn.style.color = "#fff";
+                }, 1500);
+            });
+        }
+    </script>
+</body>
+</html>
