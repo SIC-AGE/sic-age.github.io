@@ -1,21 +1,12 @@
-# 项目名称 (Project Name)
+# THE SILICON-CARBON HYBRIDIZATION: GENESIS
 
-> 简短的一句话介绍项目功能 [6]
+> Editing.......
 
-## 目录
-- [功能特性](#功能特性)
-- [安装指南](#安装指南)
-- [使用示例](#使用示例)
-- [贡献指南](#贡献指南)
+## GET FILES
+- [01.pdf](#01.pdf)
+- [02.pdf](#02.pdf)
+- [03.pdf](#03.pdf)
+- [04.pdf](#04.pdf)
 
-## 功能特性
-- 特性一
-- 特性二
-- 特性三
-
-## 安装指南
-```bash
-# 代码示例 [7]
-git clone https://github.com/username/project.git
-cd project
-npm install
+## Email
+- si-c@mail.com
