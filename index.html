@@ -223,6 +223,12 @@
             .hero-title h1 { font-size: 4.5rem; }
             .glitch-sub { font-size: 0.7rem; letter-spacing: 6px; }
             .grid { grid-template-columns: 1fr; gap: 20px; }
+
+            /* 3. 手机端文字下移，框位置不动 */
+            .terminal-content {
+                justify-content: flex-start; /* 改为从上往下排 */
+                padding-top: 50px;          /* 通过内边距将文字整体往下拉 */
+            }
         }
     </style>
 </head>
@@ -330,7 +336,18 @@
         }
         function updateTimestamp() { const now = new Date(); document.getElementById('timestamp').innerText = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0') + ":" + now.getSeconds().toString().padStart(2,'0'); }
         function startSystem() { const boot = document.getElementById('boot-screen'); initParticles(); drawParticles(); initCircuit(); drawCircuit(); typeCode(); setInterval(updateTimestamp, 1000); setTimeout(() => { if(boot) { boot.style.opacity = '0'; setTimeout(() => { boot.style.display = 'none'; }, 1000); } }, 2500); }
-        window.addEventListener('resize', () => { initParticles(); initCircuit(); });
+        
+        // 修正背景随下拉“跑位”的逻辑
+        let lastWidth = window.innerWidth;
+        window.addEventListener('resize', () => { 
+            // 只有当宽度变化（转屏）时才重新初始化背景，忽略下拉导致的高度变化
+            if (window.innerWidth !== lastWidth) {
+                initParticles(); 
+                initCircuit(); 
+                lastWidth = window.innerWidth;
+            }
+        });
+
         document.addEventListener('DOMContentLoaded', startSystem);
         
         function handleMusic() { const audio = document.getElementById('bgm'); const btn = document.getElementById('music-btn'); if (audio.paused) { audio.play().catch(e => console.log("Blocked")); btn.innerText = "AUDIO: ON"; btn.style.background = "#fff"; btn.style.color = "#000"; } else { audio.pause(); btn.innerText = "AUDIO: OFF"; btn.style.background = "transparent"; btn.style.color = "#fff"; } }
