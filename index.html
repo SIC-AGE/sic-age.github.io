@@ -8,16 +8,15 @@
     <style>
         :root {
             --accent: #ffffff;
-            --bg: #000000;
-            --border-dim: rgba(255, 255, 255, 0.1);
-            --glow: 0 0 20px rgba(255, 255, 255, 0.4);
-            --super-glow: 0 0 30px rgba(255, 255, 255, 0.8), 0 0 60px rgba(255, 255, 255, 0.4);
+            --bg: #0a0a0a;
+            --border-dim: rgba(255, 255, 255, 0.15);
+            --border-active: rgba(255, 255, 255, 0.6);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
         body { 
-            background: var(--bg); 
+            background: #000; 
             color: var(--accent); 
             font-family: 'JetBrains Mono', monospace;
             overflow-x: hidden;
@@ -26,195 +25,236 @@
             -moz-transform-origin: top center;
         }
 
-        #boot-screen {
-            position: fixed; inset: 0; background: #000; z-index: 9999;
-            display: flex; flex-direction: column; justify-content: center; align-items: center;
-            transition: opacity 1s ease;
-            cursor: pointer;
-        }
-        .boot-logo { 
-            font-family: 'Orbitron'; 
-            font-size: clamp(4rem, 15vw, 16rem); 
-            font-weight: 900; 
-            letter-spacing: 20px; 
-            white-space: nowrap;
-            animation: logo-entry 1.5s ease-out forwards;
-        }
-
-        @keyframes logo-entry {
-            0% { opacity: 0; transform: scale(0.5); letter-spacing: 80px; }
-            100% { opacity: 1; transform: scale(1); letter-spacing: 20px; }
-        }
-
-        header {
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center;
-            padding: 25px 5vw; 
+        /* 导航栏背景条 + 扫光动画 */
+        nav.top-bar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 90px; 
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
             border-bottom: 1px solid var(--border-dim);
-            backdrop-filter: blur(20px); 
-            -webkit-backdrop-filter: blur(20px);
-            position: sticky; 
-            top: 0; 
-            z-index: 100;
-            flex-wrap: nowrap;
-            gap: 15px;
+            z-index: 90;
+            pointer-events: none;
+            overflow: hidden; /* 必须溢出隐藏，确保光影不出界 */
         }
 
-        .logo-group { 
+        /* 扫光伪元素 */
+        nav.top-bar::after {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -150%; /* 初始位置在屏幕左侧外部 */
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0) 30%, 
+                rgba(255, 255, 255, 0.15) 50%, 
+                rgba(255, 255, 255, 0) 70%, 
+                transparent 100%
+            );
+            animation: sweep 3s infinite linear;
+        }
+
+        @keyframes sweep {
+            0% { left: -150%; }
+            90% { left: 150%; } /* 快速划过 */
+            100% { left: 150%; } /* 停留一段时间再重复 */
+        }
+
+        #particle-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -4;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%); 
+        }
+
+        #circuit-canvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -3;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .holographic-sun {
+            position: fixed; top: -300px; left: -300px; width: 1100px; height: 1100px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.03) 40%, transparent 75%);
+            border-radius: 50%; z-index: -1; filter: blur(40px);
+            animation: sun-move 90s linear infinite alternate;
+            pointer-events: none;
+        }
+
+        .holographic-sun::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 4000px; height: 1px;
+            background: linear-gradient(90deg, 
+                transparent 0%, 
+                rgba(255, 255, 255, 0) 35%, 
+                rgba(255, 255, 255, 0.4) 50%, 
+                rgba(255, 255, 255, 0) 65%, 
+                transparent 100%
+            );
+            transform: translate(-50%, -50%) rotate(45deg);
+            filter: blur(1px);
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            animation: flare-pulse 8s ease-in-out infinite;
+        }
+
+        @keyframes flare-pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .sun-core {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 200px; height: 200px; background: #ffffff; border-radius: 50%;
+            box-shadow: 0 0 0 2px rgba(255,255,255,0.8), 0 0 60px 20px rgba(255,255,255,0.4), 0 0 120px 40px rgba(255,255,255,0.2);
+            filter: blur(1px);
+        }
+        .sun-halo {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 1000px; height: 1000px; border-radius: 50%;
+            box-shadow: 0 0 3px 2px rgba(255, 255, 255, 0.7), 0 0 12px 6px rgba(255, 200, 100, 0.5), 0 0 20px 10px rgba(100, 255, 255, 0.4);
+            background: radial-gradient(circle, transparent 66%, rgba(255, 100, 100, 0.12) 68%, rgba(255, 200, 100, 0.18) 70%, rgba(100, 255, 255, 0.18) 73%, rgba(100, 100, 255, 0.12) 75%, transparent 80%);
+            filter: blur(1.5px);
+        }
+        @keyframes sun-move { 0% { transform: translate(10vw, 5vh); } 100% { transform: translate(65vw, 15vh); } }
+
+        /* UI 对齐修正 */
+        .floating-ui-left {
+            position: fixed; 
+            top: 24px; 
+            left: 5vw; 
+            z-index: 100;
             display: flex; 
             align-items: center; 
-            gap: 12px; 
-            font-family: 'Orbitron'; 
-            font-weight: 900; 
-            letter-spacing: 2px;
-            white-space: nowrap;
-            flex-shrink: 1;
+            gap: 15px;
+            height: 42px; 
+            font-family: 'Orbitron'; font-weight: 900; letter-spacing: 3px;
         }
-
-        .status-tag { 
-            font-size: 0.6rem; 
-            color: #888; 
-            border: 1px solid #333; 
-            padding: 2px 8px; 
-            flex-shrink: 0;
-        }
-
-        .music-toggle {
-            border: 1px solid #fff; padding: 8px 20px; 
-            font-family: 'Orbitron'; font-size: 0.7rem;
-            background: transparent; color: #fff; 
-            transition: 0.3s; cursor: pointer;
-            white-space: nowrap;
-            flex-shrink: 0;
-        }
-        .music-toggle:hover { background: #fff; color: #000; box-shadow: var(--glow); }
-
-        .overlay { position: fixed; inset: 0; pointer-events: none; z-index: 5; }
-        .vignette { background: radial-gradient(circle, transparent 30%, black 150%); }
-        
-        .bg-container { 
+        .floating-ui-right { 
             position: fixed; 
-            inset: 0; 
-            z-index: -1; 
-            filter: grayscale(0.5); 
-            opacity: 0.5; 
+            top: 24px; 
+            right: 5vw; 
+            z-index: 100; 
+            height: 42px;
+            display: flex;
+            align-items: center;
         }
-        .bg-video { width: 100%; height: 100%; object-fit: cover; }
-
-        .main-frame { max-width: 1500px; margin: 0 auto; padding: 80px 5vw; position: relative; z-index: 10; }
-
-        .hero { display: flex; justify-content: space-between; align-items: center; margin-bottom: 80px; gap: 50px; }
         
-        .hero-title h1 { 
-            font-family: 'Orbitron'; 
-            font-size: clamp(4rem, 10vw, 10rem); 
-            line-height: 0.85; 
-            background: #fff;
-            -webkit-background-clip: text; 
-            -webkit-text-fill-color: transparent;
-            display: inline-block;
+        .status-tag { font-size: 0.6rem; color: #fff; border: 1px solid #fff; padding: 2px 8px; background: rgba(255,255,255,0.1); }
+        
+        .music-toggle {
+            height: 42px; 
+            border: 1px solid rgba(255,255,255,0.4); padding: 0 20px; 
+            font-family: 'Orbitron'; font-size: 0.7rem; background: transparent; 
+            color: #fff; transition: 0.3s; cursor: pointer;
+            display: flex; align-items: center; justify-content: center;
         }
+        .music-toggle:hover { background: #fff; color: #000; border-color: #fff; }
 
-        .glitch-sub { font-family: 'Orbitron'; letter-spacing: 12px; font-size: 1.1rem; margin-top: 25px; color: #888; }
+        .main-frame { max-width: 1500px; margin: 0 auto; padding: 260px 5vw 80px 5vw; position: relative; z-index: 10; }
+        
+        .hero { display: flex; justify-content: space-between; align-items: center; margin-bottom: 100px; gap: 60px; }
+        .hero-title { flex-shrink: 0; margin-left: 20px; }
+        .hero-title h1 { font-family: 'Orbitron'; font-size: clamp(3rem, 10vw, 10rem); line-height: 0.85; color: #fff; text-shadow: 0 0 50px rgba(255,255,255,0.25); }
+        .glitch-sub { font-family: 'Orbitron'; letter-spacing: 12px; font-size: 1.1rem; margin-top: 25px; color: #fff; opacity: 0.8; }
 
-        .video-wrapper {
-            flex: 1; 
-            max-width: 650px; 
-            aspect-ratio: 16/9; 
-            background: #333; 
-            position: relative;
-            -webkit-mask-image: 
-                linear-gradient(to bottom, transparent, black 15%, black 85%, transparent),
-                linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-            mask-image: 
-                linear-gradient(to bottom, transparent, black 15%, black 85%, transparent),
-                linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-            -webkit-mask-composite: source-in;
-            mask-composite: intersect;
+        .monitor-wrapper {
+            flex: 1; max-width: 650px; aspect-ratio: 16/9; background: transparent; position: relative;
+            border: 1px solid var(--border-dim); border-radius: 2px; overflow: hidden; display: flex; flex-direction: column; transition: 0.5s;
         }
-
-        .video-wrapper video { 
-            width: 100%; 
-            height: 100%; 
-            object-fit: cover; 
-            filter: grayscale(0.5) contrast(1.1) brightness(0.9); 
-            opacity: 0.3; 
+        .monitor-wrapper:hover { border-color: var(--border-active); background: rgba(255,255,255,0.03); }
+        
+        .monitor-header {
+            padding: 12px 15px; 
+            background: transparent; 
+            font-size: 0.65rem; letter-spacing: 2px;
+            display: flex; justify-content: space-between; align-items: center; 
+            border-bottom: 1px solid var(--border-dim);
+            position: relative; z-index: 5;
         }
+        
+        .terminal-content { 
+            padding: 0px 20px 15px 20px; 
+            flex: 1; font-size: 0.85rem; line-height: 1.6; color: #fff; 
+            display: flex; flex-direction: column; justify-content: flex-end; 
+            overflow: hidden; transform: translate(0px, 6px);
+            text-align: left !important;
+        }
+        .code-line { white-space: nowrap; overflow: hidden; margin-bottom: 2px; flex-shrink: 0; text-align: left; }
 
         .grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px; }
-        .card {
-            border: 1px solid var(--border-dim); padding: 40px 30px; background: rgba(255,255,255,0.01);
-            position: relative; transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1);
-        }
-        .card:hover { border-color: #fff; transform: translateY(-5px); background: rgba(255,255,255,0.04); }
+        
+        .card { border: 1px solid var(--border-dim); padding: 40px 30px; background: transparent; position: relative; transition: 0.5s cubic-bezier(0.19, 1, 0.22, 1); }
+        .card:hover { border-color: var(--border-active); transform: translateY(-5px); background: rgba(255,255,255,0.03); }
+        
         .card-label { font-family: 'Orbitron'; font-size: 1.2rem; letter-spacing: 5px; margin-bottom: 30px; display: block; border-left: 3px solid #fff; padding-left: 15px; }
-        .card-content { font-size: 0.9rem; color: #bbb; line-height: 1.8; }
+        .card-content { font-size: 0.9rem; color: #fff; line-height: 1.8; }
 
-        .file-link {
-            display: flex; align-items: center; text-decoration: none; color: #fff;
-            padding: 10px; border: 1px solid var(--border-dim); margin-bottom: 10px;
-            font-size: 0.8rem; transition: 0.3s;
-        }
+        .file-link { display: flex; align-items: center; text-decoration: none; color: #fff; padding: 10px; border: 1px solid var(--border-dim); margin-bottom: 10px; font-size: 0.8rem; transition: 0.3s; }
         .file-link:hover { background: #fff; color: #000; }
-
-        .action-btn {
-            width: 100%; padding: 15px; background: transparent; border: 1px solid #fff;
-            color: #fff; font-family: 'Orbitron'; font-size: 0.75rem; letter-spacing: 2px;
-            margin-top: 20px; cursor: pointer;
-        }
+        .action-btn { width: 100%; padding: 15px; background: transparent; border: 1px solid #fff; color: #fff; font-family: 'Orbitron'; font-size: 0.75rem; letter-spacing: 2px; margin-top: 20px; cursor: pointer; }
         .action-btn:hover { background: #fff; color: #000; }
 
-        @media (max-width: 850px) {
+        #boot-screen {
+            position: fixed; inset: 0; background: #000; z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; transition: opacity 1s ease;
+        }
+        .boot-logo { font-family: 'Orbitron'; font-size: clamp(4rem, 15vw, 16rem); font-weight: 900; letter-spacing: 20px; animation: logo-entry 1.5s ease-out forwards; }
+        @keyframes logo-entry { 0% { opacity: 0; transform: scale(0.5); letter-spacing: 80px; } 100% { opacity: 1; transform: scale(1); letter-spacing: 20px; } }
+        .vignette { position: fixed; inset: 0; pointer-events: none; z-index: 5; background: radial-gradient(circle, transparent 50%, rgba(0,0,0,0.5) 150%); }
+
+        @media (max-width: 950px) {
             body { zoom: 1; -moz-transform: none; }
             .hero { flex-direction: column; text-align: center; }
-            .hero-title h1 { font-size: 4rem; }
             .grid { grid-template-columns: 1fr; }
-            header { padding: 15px 4vw; gap: 8px; }
-            .logo-group { font-size: 0.8rem; gap: 6px; }
-            .status-tag { padding: 1px 4px; font-size: 0.5rem; }
-            .music-toggle { padding: 6px 12px; font-size: 0.6rem; }
-            .video-wrapper { width: 100%; max-width: 100%; }
+            .main-frame { padding-top: 200px; }
         }
     </style>
 </head>
 <body>
 
-    <div id="boot-screen">
-        <div class="boot-logo">SI-C</div>
-    </div>
+    <nav class="top-bar"></nav>
 
-    <audio id="bgm" loop preload="auto"><source src="bgm.mp3" type="audio/mpeg"></audio>
-
-    <div class="overlay vignette"></div>
+    <div class="holographic-sun"><div class="sun-halo"></div><div class="sun-core"></div></div>
+    <canvas id="particle-canvas"></canvas>
+    <canvas id="circuit-canvas"></canvas>
     
-    <div class="bg-container">
-        <video class="bg-video" autoplay loop muted playsinline webkit-playsinline x5-video-player-type="h5">
-            <source src="background.mp4" type="video/mp4">
-            <source src="background.mp4" type="video/webm">
-        </video>
+    <div id="boot-screen"><div class="boot-logo">SI-C</div></div>
+    <audio id="bgm" loop preload="auto"><source src="bgm.mp3" type="audio/mpeg"></audio>
+    <div class="vignette"></div>
+
+    <div class="floating-ui-left">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="white"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        <span>GENESIS</span>
+        <span class="status-tag">REV.02/2026</span>
     </div>
 
-    <header>
-        <div class="logo-group">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
-            </svg>
-            GENESIS <span class="status-tag">REV. FEB 2026</span>
-        </div>
+    <div class="floating-ui-right">
         <button class="music-toggle" id="music-btn" onclick="handleMusic()">AUDIO : OFF</button>
-    </header>
+    </div>
 
     <main class="main-frame">
         <section class="hero">
             <div class="hero-title">
                 <h1>SI-C</h1>
-                <p class="glitch-sub">HYBRID INTELLIGENCE</p>
+                <p class="glitch-sub">PURE ARCHITECTURE</p>
             </div>
-            <div class="video-wrapper">
-                <video autoplay loop muted playsinline webkit-playsinline x5-video-player-type="h5">
-                    <source src="video.mp4" type="video/mp4">
-                </video>
+            <div class="monitor-wrapper">
+                <div class="monitor-header">
+                    <span style="display:flex; align-items:center; gap:8px;">
+                        <span style="width:6px; height:6px; background:#fff; border-radius:50%; box-shadow: 0 0 15px #fff;"></span>
+                        LIVE_SYSTEM_LOG
+                    </span>
+                    <span id="timestamp">00:00:00</span>
+                </div>
+                <div class="terminal-content" id="terminal"></div>
             </div>
         </section>
 
@@ -222,92 +262,190 @@
             <article class="card">
                 <span class="card-label">INFO</span>
                 <div class="card-content">
-                    [ SYSTEM_LOG ]<br>
-                    > INITIALIZING... DONE<br>
-                    > DATA_SYNC... ACTIVE<br>
-                    > LOCATION: UNDISCLOSED
+                    [ SYSTEM_LOAD ]<br>
+                    > NEURAL_CORE: ACTIVE<br>
+                    > AMBIENT_SYNC: OPTIMAL<br>
+                    > VERSION: 2026.FEB.28
                 </div>
             </article>
-
             <article class="card">
                 <span class="card-label">DATA</span>
                 <div class="card-content">
-                    <a href="01.pdf" target="_blank" class="file-link"><span>[01]</span> NEURAL_NET.PDF</a>
-                    <a href="02.pdf" target="_blank" class="file-link"><span>[02]</span> SYNTH_ARCH.PDF</a>
-                    <a href="03.pdf" target="_blank" class="file-link"><span>[03]</span> CORE_DUMP.PDF</a>
+                    <a href="01.pdf" target="_blank" class="file-link"><span>[01]</span> BLUEPRINT.PDF</a>
+                    <a href="02.pdf" target="_blank" class="file-link"><span>[02]</span> SCHEMATIC.PDF</a>
+                    <a href="03.pdf" target="_blank" class="file-link"><span>[03]</span> PROTOCOL.PDF</a>
                 </div>
             </article>
-
             <article class="card">
                 <span class="card-label">LINK</span>
                 <div class="card-content">
-                    <code style="display: block; background: transparent; padding: 10px; border: 1px dashed #444; text-align: center; margin-bottom:10px;">SI-C@MAIL.COM</code>
-                    <button class="action-btn" id="copy-btn" onclick="copyToClipboard('si-c@mail.com')">
-                        CLICK TO COPY
-                    </button>
+                    <code style="display: block; background: transparent; padding: 10px; border: 1px solid #777; text-align: center; margin-bottom:10px;">SI-C@MAIL.COM</code>
+                    <button class="action-btn" id="copy-btn" onclick="copyToClipboard('si-c@mail.com')">COPY</button>
                 </div>
             </article>
         </div>
     </main>
 
     <script>
-        // 核心：处理所有视频的播放逻辑
-        function activateVideos() {
-            const videos = document.querySelectorAll('video');
-            videos.forEach(v => {
-                v.muted = true;
-                v.playsInline = true;
-                const promise = v.play();
-                if (promise !== undefined) {
-                    promise.catch(() => {
-                        // 如果自动播放被拦截，通过后续点击激活
-                    });
+        const pCanvas = document.getElementById('particle-canvas');
+        const pCtx = pCanvas.getContext('2d');
+        let particles = []; let mouse = { x: -100, y: -100 };
+
+        function initParticles() {
+            pCanvas.width = window.innerWidth; pCanvas.height = window.innerHeight;
+            particles = [];
+            const count = Math.floor((pCanvas.width * pCanvas.height) / 10000);
+            for (let i = 0; i < count; i++) {
+                particles.push({
+                    x: Math.random() * pCanvas.width, y: Math.random() * pCanvas.height,
+                    vx: (Math.random() - 0.5) * 0.4, vy: Math.random() * 0.4 + 0.1, 
+                    size: Math.random() * 2 + 0.5, opacity: Math.random() * 0.5 + 0.1
+                });
+            }
+        }
+
+        function drawParticles() {
+            pCtx.clearRect(0, 0, pCanvas.width, pCanvas.height);
+            for (let i = 0; i < particles.length; i++) {
+                let p = particles[i]; p.y += p.vy; p.x += p.vx;
+                if (p.y > pCanvas.height) p.y = 0;
+                if (p.x > pCanvas.width) p.x = 0; if (p.x < 0) p.x = pCanvas.width;
+                const dx = p.x - mouse.x; const dy = p.y - mouse.y; const dist = Math.sqrt(dx*dx + dy*dy);
+                if (dist < 200) { const force = (200 - dist) / 200; p.x += (dx / dist) * force * 4; p.y += (dy / dist) * force * 4; }
+                pCtx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+                pCtx.beginPath(); pCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2); pCtx.fill();
+            }
+            requestAnimationFrame(drawParticles);
+        }
+
+        const cCanvas = document.getElementById('circuit-canvas');
+        const cCtx = cCanvas.getContext('2d');
+        let lines = [];
+        const maxLines = 40;
+
+        class CircuitLine {
+            constructor() { this.init(); }
+            init() {
+                this.x = Math.random() * cCanvas.width;
+                this.y = Math.random() * cCanvas.height;
+                this.points = [{x: this.x, y: this.y}];
+                this.maxLength = 6 + Math.random() * 6;
+                this.speed = 1.0 + Math.random() * 1.2;
+                this.angle = (Math.floor(Math.random() * 4) * 90) * (Math.PI / 180);
+                this.dataPoints = [];
+            }
+            update() {
+                let lastPoint = this.points[this.points.length - 1];
+                let newX = lastPoint.x + Math.cos(this.angle) * this.speed;
+                let newY = lastPoint.y + Math.sin(this.angle) * this.speed;
+                if (Math.random() < 0.03 && this.points.length < this.maxLength) {
+                    this.points.push({x: newX, y: newY});
+                    this.angle += (Math.random() > 0.5 ? 90 : -90) * (Math.PI / 180);
                 }
-            });
+                lastPoint.x = newX; lastPoint.y = newY;
+                if (Math.random() < 0.02) this.dataPoints.push({ progress: 0, speed: 0.008 + Math.random() * 0.015 });
+                if (newX < 0 || newX > cCanvas.width || newY < 0 || newY > cCanvas.height) this.init();
+            }
+            draw() {
+                cCtx.strokeStyle = 'rgba(255, 255, 255, 0.03)';
+                cCtx.lineWidth = 1;
+                cCtx.beginPath();
+                cCtx.moveTo(this.points[0].x, this.points[0].y);
+                for (let i = 1; i < this.points.length; i++) cCtx.lineTo(this.points[i].x, this.points[i].y);
+                cCtx.stroke();
+                this.dataPoints.forEach((dp, index) => {
+                    dp.progress += dp.speed;
+                    if (dp.progress >= 1) { this.dataPoints.splice(index, 1); return; }
+                    let totalSegs = this.points.length - 1;
+                    let currSeg = Math.floor(dp.progress * totalSegs);
+                    let segProg = (dp.progress * totalSegs) % 1;
+                    let p1 = this.points[currSeg], p2 = this.points[currSeg + 1];
+                    if(p1 && p2) {
+                        let dx = p1.x + (p2.x - p1.x) * segProg, dy = p1.y + (p2.y - p1.y) * segProg;
+                        cCtx.fillStyle = 'rgba(255, 255, 255, 0.4)';
+                        cCtx.shadowBlur = 4; cCtx.shadowColor = '#fff';
+                        cCtx.fillRect(dx - 0.7, dy - 0.7, 1.4, 1.4);
+                        cCtx.shadowBlur = 0;
+                    }
+                });
+            }
+        }
+
+        function initCircuit() {
+            cCanvas.width = window.innerWidth; cCanvas.height = window.innerHeight;
+            lines = []; for(let i=0; i<maxLines; i++) lines.push(new CircuitLine());
+        }
+
+        function drawCircuit() {
+            cCtx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+            cCtx.fillRect(0, 0, cCanvas.width, cCanvas.height);
+            lines.forEach(line => { line.update(); line.draw(); });
+            requestAnimationFrame(drawCircuit);
+        }
+
+        window.addEventListener('mousemove', e => { mouse.x = e.clientX; mouse.y = e.clientY; });
+
+        const terminal = document.getElementById('terminal');
+        const codeSnippets = [
+            "> [BOOT] INITIALIZING_COBALT_V4.2...",
+            "> [CORE] NEURAL_LINK_ESTABLISHED",
+            "> [SYNC] CALIBRATING_STAR_CORE_LUMINANCE",
+            "> [DATA] FETCHING_ARCHIVE_ENCRYPTION_KEYS",
+            "> [INFO] AMBIENT_PARTICLE_SYNC: 100%",
+            "> [LINK] SECURE_RELAY_CONNECTED: PORT_8080",
+            "> [BOOT] ALL_SYSTEMS_OPERATIONAL",
+            "> [AUTH] USER_GENESIS_ACCESS_GRANTED",
+            "> [TASK] RUNNING_BACKGROUND_CLEANUP",
+            "> [CORE] TEMPERATURE_STABLE_AT_32K",
+            "> [WAIT] LISTENING_FOR_INCOMING_SIGNAL..."
+        ];
+        
+        let currentLine = null; let charIndex = 0; let snippetIndex = 0;
+
+        function typeCode() {
+            if (!currentLine) {
+                currentLine = document.createElement('div'); currentLine.className = 'code-line'; terminal.appendChild(currentLine);
+                if (terminal.childNodes.length > 13) terminal.removeChild(terminal.firstChild);
+            }
+            const fullText = codeSnippets[snippetIndex];
+            currentLine.textContent = fullText.substring(0, charIndex) + (charIndex < fullText.length ? "▊" : "");
+            if (charIndex < fullText.length) { charIndex++; setTimeout(typeCode, 15 + Math.random() * 35); }
+            else { charIndex = 0; snippetIndex = (snippetIndex + 1) % codeSnippets.length; currentLine = null; setTimeout(typeCode, 600); }
+        }
+
+        function updateTimestamp() {
+            const now = new Date();
+            document.getElementById('timestamp').innerText = now.getHours().toString().padStart(2,'0') + ":" + now.getMinutes().toString().padStart(2,'0') + ":" + now.getSeconds().toString().padStart(2,'0');
         }
 
         function startSystem() {
             const boot = document.getElementById('boot-screen');
-            
-            // 首次尝试激活
-            activateVideos();
-
+            initParticles(); drawParticles(); 
+            initCircuit(); drawCircuit();
+            typeCode(); setInterval(updateTimestamp, 1000);
             setTimeout(() => {
-                boot.style.opacity = '0';
-                setTimeout(() => {
-                    boot.style.display = 'none';
-                }, 1000);
+                if(boot) {
+                    boot.style.opacity = '0';
+                    setTimeout(() => { boot.style.display = 'none'; }, 1000);
+                }
             }, 2500); 
         }
 
-        // 核心修复：监听全局点击/触摸，一旦用户碰了屏幕，强制激活所有视频
-        // 这在 iOS Safari 下是 100% 解锁视频自动播放的方法
-        document.addEventListener('touchstart', activateVideos, { once: true });
-        document.addEventListener('mousedown', activateVideos, { once: true });
+        window.addEventListener('resize', () => { initParticles(); initCircuit(); });
         document.addEventListener('DOMContentLoaded', startSystem);
 
-        const audio = document.getElementById('bgm');
-        const btn = document.getElementById('music-btn');
         function handleMusic() {
-            if (audio.paused) {
-                audio.play().catch(e => console.log("Audio blocked"));
-                btn.innerText = "AUDIO: ON";
-                btn.style.background = "#fff";
-                btn.style.color = "#000";
-            } else {
-                audio.pause();
-                btn.innerText = "AUDIO: OFF";
-                btn.style.background = "transparent";
-                btn.style.color = "#fff";
-            }
+            const audio = document.getElementById('bgm');
+            const btn = document.getElementById('music-btn');
+            if (audio.paused) { audio.play().catch(e => console.log("Blocked")); btn.innerText = "AUDIO: ON"; btn.style.background = "#fff"; btn.style.color = "#000"; }
+            else { audio.pause(); btn.innerText = "AUDIO: OFF"; btn.style.background = "transparent"; btn.style.color = "#fff"; }
         }
 
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
                 const copyBtn = document.getElementById('copy-btn');
-                const originalText = copyBtn.innerText;
-                copyBtn.innerText = "COPIED";
-                setTimeout(() => { copyBtn.innerText = originalText; }, 2000);
+                const original = copyBtn.innerText; copyBtn.innerText = "COPIED";
+                setTimeout(() => copyBtn.innerText = original, 2000);
             });
         }
     </script>
