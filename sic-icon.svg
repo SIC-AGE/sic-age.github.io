@@ -5,7 +5,7 @@
   <!-- 白色大写字母 S，视觉居中 -->
   <text 
     x="50" 
-    y="60.5" 
+    y="59" 
     font-family="'Arial Black', 'Impact', 'Helvetica Neue', Arial, sans-serif" 
     font-weight="900" 
     font-size="90" 
@@ -16,5 +16,6 @@
     S
   </text>
 </svg>
+
 
 
